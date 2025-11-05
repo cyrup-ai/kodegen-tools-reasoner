@@ -22,9 +22,9 @@ crate-type = ["lib"]  # Native library, not WASM
 
 [dependencies]
 # Core MCP tool infrastructure
-kodegen_mcp_tool = { version = "0.1" }
-kodegen_mcp_schema = { version = "0.1" }
-kodegen_server_http = { version = "0.1" }
+kodegen_mcp_tool = { path = "../kodegen-mcp-tool" }
+kodegen_mcp_schema = { path = "../kodegen-mcp-schema" }
+kodegen_server_http = { path = "../kodegen-server-http" }
 rmcp = { version = "0.8", features = [
     "client", "schemars", "server",
     "transport-child-process", "transport-io", "transport-sse-client",
