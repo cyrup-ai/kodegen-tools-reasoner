@@ -52,7 +52,7 @@ uuid = { version = "1", features = ["serde", "v4"] }
 lru = "0.16"
 
 # Local Stella embeddings via Candle (replaces VoyageAI)
-kodegen_candle_agent = { path = "../tools-candle-agent" }
+kodegen_candle_agent = { path = "../kodegen-candle-agent" }
 
 # Regex for logical scoring (strategies/base.rs)
 regex = "1"
