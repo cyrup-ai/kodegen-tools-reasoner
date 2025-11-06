@@ -20,6 +20,14 @@ license = "Apache-2.0 OR MIT"
 name = "kodegen_tools_reasoner"
 crate-type = ["lib"]  # Native library, not WASM
 
+[package.metadata.bundle]
+identifier = "ai.kodegen.kodegen_tools_reasoner"
+publisher = "KODEGEN.ᴀɪ"
+category = "Developer Tool"
+copyright = "Copyright © 2025"
+short_description = "Memory-efficient, Blazing-Fast, MCP tools for code generation agents."
+
+
 [dependencies]
 # Core MCP tool infrastructure
 kodegen_mcp_tool = { version = "0.1" }
