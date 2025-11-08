@@ -25,7 +25,7 @@ pub mod types;
 // Public re-exports
 pub use types::{
     AsyncPath, AsyncTask, ClearedSignal, Metric, MetricStream, Reasoning, ReasoningError,
-    Strategy, TaskStream, NOVELTY_MARKERS, LOGICAL_CONNECTORS, MATH_EXPRESSIONS,
+    Strategy, TaskStream, NOVELTY_MARKERS,
 };
 
 /// Base strategy implementation that provides common functionality

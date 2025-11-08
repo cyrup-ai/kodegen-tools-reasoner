@@ -99,7 +99,7 @@ impl TreeOperations {
             })
             .max_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal))
             .map(|(_, node)| node)
-            .unwrap_or_else(|| PolicyGuidedNode::default_node())
+            .unwrap_or_else(PolicyGuidedNode::default_node)
     }
 
     pub async fn expand_with_policy(

@@ -1,0 +1,50 @@
+    Checking kodegen_tools_reasoner v0.1.0 (/Users/davidmaple/kodegen-workspace/kodegen-tools-reasoner)
+error: unused imports: `LOGICAL_CONNECTORS` and `MATH_EXPRESSIONS`
+  --> src/strategies/base/mod.rs:28:44
+   |
+28 |     Strategy, TaskStream, NOVELTY_MARKERS, LOGICAL_CONNECTORS, MATH_EXPRESSIONS,
+   |                                            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^
+   |
+   = note: `-D unused-imports` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error: unused imports: `BidirectionalPolicyNode` and `BidirectionalStats`
+  --> src/strategies/mcts_002alt_alpha/mod.rs:10:17
+   |
+10 | pub use types::{BidirectionalPolicyNode, BidirectionalStats};
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+
+error: method `reset_metrics` is never used
+   --> src/strategies/mcts_002_alpha/metrics.rs:135:18
+    |
+ 16 | impl MetricsTracker {
+    | ------------------- method in this implementation
+...
+135 |     pub async fn reset_metrics(&self) {
+    |                  ^^^^^^^^^^^^^
+    |
+    = note: `-D dead-code` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(dead_code)]`
+
+error: associated function `new` is never used
+  --> src/strategies/mcts_002_alpha/types.rs:93:12
+   |
+91 | impl PolicyMetrics {
+   | ------------------ associated function in this implementation
+92 |     /// Creates a new PolicyMetrics instance with default values
+93 |     pub fn new(temperature: f64, exploration_rate: f64, novelty_bonus: f64) -> Self {
+   |            ^^^
+
+error: redundant closure
+   --> src/strategies/mcts_002_alpha/tree_ops.rs:102:29
+    |
+102 |             .unwrap_or_else(|| PolicyGuidedNode::default_node())
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace the closure with the associated function itself: `PolicyGuidedNode::default_node`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#redundant_closure
+    = note: `-D clippy::redundant-closure` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::redundant_closure)]`
+
+error: could not compile `kodegen_tools_reasoner` (lib) due to 5 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `kodegen_tools_reasoner` (lib test) due to 5 previous errors

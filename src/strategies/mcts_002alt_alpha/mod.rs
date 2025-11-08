@@ -7,4 +7,3 @@ mod strategy_impl;
 
 // Public exports
 pub use core::MCTS002AltAlphaStrategy;
-pub use types::{BidirectionalPolicyNode, BidirectionalStats};

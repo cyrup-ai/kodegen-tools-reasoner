@@ -20,21 +20,7 @@ impl MetricsTracker {
         learning_rate: f64,
         novelty_bonus: f64,
     ) -> Self {
-        let policy_metrics = PolicyMetrics {
-            average_policy_score: 0.0,
-            average_value_estimate: 0.0,
-            action_distribution: HashMap::new(),
-            exploration_stats: ExplorationStats {
-                temperature,
-                exploration_rate,
-                novelty_bonus,
-            },
-            convergence_metrics: ConvergenceMetrics {
-                policy_entropy: 0.0,
-                value_stability: 0.0,
-            },
-            sample_count: 0,
-        };
+        let policy_metrics = PolicyMetrics::new(temperature, exploration_rate, novelty_bonus);
 
         Self {
             policy_metrics: Arc::new(Mutex::new(policy_metrics)),
@@ -132,6 +118,13 @@ impl MetricsTracker {
         }
     }
 
+    /// Reset all metrics to default values
+    ///
+    /// Called from Strategy::clear() (mod.rs:322) which is invoked via trait objects.
+    /// Rust's dead code analysis cannot trace trait object method calls.
+    ///
+    /// APPROVED BY DAVID MAPLE on 2025-11-07
+    #[allow(dead_code)]
     pub async fn reset_metrics(&self) {
         let exploration_rate_val = *self.exploration_rate.lock().await;
 

@@ -1,0 +1,2 @@
+    Checking kodegen_tools_reasoner v0.1.0 (/Users/davidmaple/kodegen-workspace/kodegen-tools-reasoner)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.28s
