@@ -23,9 +23,12 @@ crate-type = ["lib"]  # Native library, not WASM
 [package.metadata.bundle]
 identifier = "ai.kodegen.kodegen_tools_reasoner"
 publisher = "KODEGEN.ᴀɪ"
-category = "Developer Tool"
 copyright = "Copyright © 2025"
 short_description = "Memory-efficient, Blazing-Fast, MCP tools for code generation agents."
+
+[package.metadata.bundle.category]
+linux = "Development"
+macos = "public.app-category.developer-tools"
 
 
 [dependencies]
