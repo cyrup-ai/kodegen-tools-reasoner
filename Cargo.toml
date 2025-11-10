@@ -36,6 +36,8 @@ macos = "public.app-category.developer-tools"
 kodegen_mcp_tool = { version = "0.1" }
 kodegen_mcp_schema = { version = "0.1" }
 kodegen_server_http = { version = "0.1" }
+kodegen_candle_agent = { version = "0.1" }
+
 rmcp = { version = "0.8", features = [
     "client", "schemars", "server",
     "transport-child-process", "transport-io", "transport-sse-client",
@@ -61,9 +63,6 @@ uuid = { version = "1", features = ["serde", "v4"] }
 
 # LRU cache for state management
 lru = "0.16"
-
-# Local Stella embeddings via Candle (replaces VoyageAI)
-kodegen_candle_agent = { path = "../kodegen-candle-agent" }
 
 # Regex for logical scoring (strategies/base.rs)
 regex = "1"
