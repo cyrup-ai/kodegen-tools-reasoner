@@ -141,7 +141,7 @@ MCTS variant that rewards longer, more detailed reasoning paths.
 
 ## MCP Tool API
 
-### Tool: `sequential_thinking_reasoner`
+### Tool: `reasoner`
 
 Process thoughts step-by-step with advanced reasoning strategies.
 
@@ -190,7 +190,7 @@ Process thoughts step-by-step with advanced reasoning strategies.
 ```
 ┌─────────────────────────────────────────┐
 │         MCP Tool Interface              │
-│    (sequential_thinking_reasoner)       │
+│           (reasoner)                    │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐

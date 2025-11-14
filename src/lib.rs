@@ -14,7 +14,7 @@ pub use types::*;
 
 use kodegen_mcp_tool::{Tool, error::McpError};
 use kodegen_mcp_schema::reasoning::{ReasonerArgs, ReasonerPromptArgs};
-use rmcp::model::{PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole};
+use rmcp::model::{Content, PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole};
 use serde_json::Value;
 use std::sync::Arc;
 
@@ -24,11 +24,11 @@ use std::sync::Arc;
 
 /// Advanced reasoning tool with multiple strategies
 #[derive(Clone)]
-pub struct SequentialThinkingReasonerTool {
+pub struct ReasonerTool {
     reasoner: Arc<Reasoner>,
 }
 
-impl SequentialThinkingReasonerTool {
+impl ReasonerTool {
     /// Create new reasoner tool with optional cache size
     pub fn new(cache_size: Option<usize>) -> Self {
         Self {
@@ -37,12 +37,12 @@ impl SequentialThinkingReasonerTool {
     }
 }
 
-impl Tool for SequentialThinkingReasonerTool {
+impl Tool for ReasonerTool {
     type Args = ReasonerArgs;
     type PromptArgs = ReasonerPromptArgs;
 
     fn name() -> &'static str {
-        "sequential_thinking_reasoner"
+        "reasoner"
     }
 
     fn description() -> &'static str {
@@ -63,7 +63,7 @@ impl Tool for SequentialThinkingReasonerTool {
         true // Only tracks reasoning state, no external modifications
     }
 
-    async fn execute(&self, args: Self::Args) -> Result<Value, McpError> {
+    async fn execute(&self, args: Self::Args) -> Result<Vec<Content>, McpError> {
         // Convert args to internal ReasoningRequest
         let request = ReasoningRequest {
             thought: args.thought,
@@ -92,9 +92,36 @@ impl Tool for SequentialThinkingReasonerTool {
         ]).await;
         response.stats = stats;
 
-        // Convert to JSON
-        serde_json::to_value(&response)
-            .map_err(|e| McpError::Other(anyhow::anyhow!("Serialization failed: {}", e)))
+        // Build Vec<Content> with two items
+        let mut contents = Vec::new();
+
+        // ========================================
+        // Content[0]: Terminal-Formatted Summary
+        // ========================================
+        let strategy = response.strategy_used.as_deref().unwrap_or("unknown");
+        let summary = format!(
+            "🧠 **Reasoning Node** `{}`\n\n\
+             📊 **Score:** {:.3} | **Depth:** {} | **Strategy:** `{}`\n\
+             ✅ **Complete:** {} | **Next Needed:** {}\n",
+            response.node_id,
+            response.score,
+            response.depth,
+            strategy,
+            response.is_complete,
+            response.next_thought_needed
+        );
+        contents.push(Content::text(summary));
+
+        // ========================================
+        // Content[1]: Machine-Parseable JSON
+        // ========================================
+        let metadata = serde_json::to_value(&response)
+            .map_err(|e| McpError::Other(anyhow::anyhow!("Serialization failed: {}", e)))?;
+        let json_str = serde_json::to_string_pretty(&metadata)
+            .unwrap_or_else(|_| "{}".to_string());
+        contents.push(Content::text(json_str));
+
+        Ok(contents)
     }
 
     fn prompt_arguments() -> Vec<PromptArgument> {
@@ -106,13 +133,13 @@ impl Tool for SequentialThinkingReasonerTool {
             PromptMessage {
                 role: PromptMessageRole::User,
                 content: PromptMessageContent::text(
-                    "How do I use the sequential_thinking_reasoner tool with different strategies?",
+                    "How do I use the reasoner tool with different strategies?",
                 ),
             },
             PromptMessage {
                 role: PromptMessageRole::Assistant,
                 content: PromptMessageContent::text(
-                    "The sequential_thinking_reasoner tool supports 4 reasoning strategies:\n\n\
+                    "The reasoner tool supports 4 reasoning strategies:\n\n\
                      1. **beam_search** (default): Explores top N paths simultaneously\n\
                         - Use for breadth-first exploration\n\
                         - Set beamWidth to control path count (default: 3)\n\n\
@@ -181,8 +208,9 @@ pub async fn start_server(
     };
 
     let shutdown_timeout = Duration::from_secs(30);
+    let session_keep_alive = Duration::ZERO;
 
-    create_http_server("reasoner", addr, tls_config, shutdown_timeout, |_config, _tracker| {
+    create_http_server("reasoner", addr, tls_config, shutdown_timeout, session_keep_alive, |_config, _tracker| {
         Box::pin(async move {
             let mut tool_router = ToolRouter::new();
             let mut prompt_router = PromptRouter::new();
@@ -192,7 +220,7 @@ pub async fn start_server(
             (tool_router, prompt_router) = register_tool(
                 tool_router,
                 prompt_router,
-                crate::SequentialThinkingReasonerTool::new(None),
+                crate::ReasonerTool::new(None),
             );
 
             Ok(RouterSet::new(tool_router, prompt_router, managers))

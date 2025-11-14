@@ -19,7 +19,7 @@ async fn main() -> Result<()> {
         (tool_router, prompt_router) = register_tool(
             tool_router,
             prompt_router,
-            kodegen_tools_reasoner::SequentialThinkingReasonerTool::new(None),
+            kodegen_tools_reasoner::ReasonerTool::new(None),
         );
 
         Ok(RouterSet::new(tool_router, prompt_router, managers))
