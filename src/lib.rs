@@ -15,7 +15,6 @@ pub use types::*;
 use kodegen_mcp_tool::{Tool, error::McpError};
 use kodegen_mcp_schema::reasoning::{ReasonerArgs, ReasonerPromptArgs};
 use rmcp::model::{Content, PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole};
-use serde_json::Value;
 use std::sync::Arc;
 
 // ============================================================================
@@ -42,7 +41,7 @@ impl Tool for ReasonerTool {
     type PromptArgs = ReasonerPromptArgs;
 
     fn name() -> &'static str {
-        "reasoner"
+        kodegen_mcp_schema::reasoning::REASONER
     }
 
     fn description() -> &'static str {

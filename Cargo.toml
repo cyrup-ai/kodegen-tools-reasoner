@@ -1,6 +1,6 @@
 [package]
 name = "kodegen_tools_reasoner"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 description = "KODEGEN.ᴀɪ: Memory-efficient, Blazing-Fast, MCP tools for code generation agents."
 authors = ["KODEGEN.ᴀɪ"]
@@ -91,7 +91,7 @@ sysinfo = "0.33"
 # Workspace hack for dependency deduplication
 
 [dev-dependencies]
-kodegen_mcp_client = { version = "0.2"  }
+kodegen_mcp_client = { version = "0.2" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 chrono = { version = "0.4", features = ["serde"] }
 

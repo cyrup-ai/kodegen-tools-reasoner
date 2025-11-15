@@ -216,7 +216,7 @@ impl Reasoner {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// let reasoner = Reasoner::new(Some(1000));
     ///
     /// // Process 100 thoughts

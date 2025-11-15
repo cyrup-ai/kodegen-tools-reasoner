@@ -19,7 +19,7 @@ const MIN_CACHE_SIZE: NonZeroUsize = NonZeroUsize::new(1).unwrap();
 /// To prevent deadlock, ALL methods acquiring multiple locks MUST respect
 /// this canonical ordering:
 ///
-/// ```
+/// ```text
 /// 1. nodes (authoritative storage)
 /// 2. cache (derived LRU cache)
 /// ```
