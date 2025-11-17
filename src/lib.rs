@@ -99,9 +99,9 @@ impl Tool for ReasonerTool {
         // ========================================
         let strategy = response.strategy_used.as_deref().unwrap_or("unknown");
         let summary = format!(
-            "🧠 **Reasoning Node** `{}`\n\n\
-             📊 **Score:** {:.3} | **Depth:** {} | **Strategy:** `{}`\n\
-             ✅ **Complete:** {} | **Next Needed:** {}\n",
+            "\x1b[35m Reasoning Node: {}\x1b[0m\n\
+              Score: {:.3} · Depth: {} · Strategy: {}\n\
+              Complete: {} · Next needed: {}",
             response.node_id,
             response.score,
             response.depth,
