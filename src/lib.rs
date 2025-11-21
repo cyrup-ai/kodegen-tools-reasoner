@@ -12,7 +12,7 @@ mod types;
 pub use reasoner::Reasoner;
 pub use types::*;
 
-use kodegen_mcp_tool::{Tool, error::McpError};
+use kodegen_mcp_tool::{Tool, ToolExecutionContext, error::McpError};
 use kodegen_mcp_schema::reasoning::{ReasonerArgs, ReasonerPromptArgs};
 use rmcp::model::{Content, PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole};
 use std::sync::Arc;
@@ -62,7 +62,7 @@ impl Tool for ReasonerTool {
         true // Only tracks reasoning state, no external modifications
     }
 
-    async fn execute(&self, args: Self::Args) -> Result<Vec<Content>, McpError> {
+    async fn execute(&self, args: Self::Args, _ctx: ToolExecutionContext) -> Result<Vec<Content>, McpError> {
         // Convert args to internal ReasoningRequest
         let request = ReasoningRequest {
             thought: args.thought,

@@ -1,6 +1,6 @@
 [package]
 name = "kodegen_tools_reasoner"
-version = "0.2.3"
+version = "0.3.1"
 edition = "2024"
 description = "KODEGEN.ᴀɪ: Memory-efficient, Blazing-Fast, MCP tools for code generation agents."
 authors = ["KODEGEN.ᴀɪ"]
@@ -33,14 +33,14 @@ macos = "public.app-category.developer-tools"
 
 [dependencies]
 # Core MCP tool infrastructure
-kodegen_mcp_tool = { version = "0.2" }
-kodegen_mcp_schema = { version = "0.2" }
-kodegen_server_http = { version = "0.2" }
-kodegen_candle_agent = { version = "0.2" }
-kodegen_config_manager = { version = "0.2" }
-kodegen_utils = { version = "0.2" }
+kodegen_mcp_tool = { version = "0.3" }
+kodegen_mcp_schema = { version = "0.3" }
+kodegen_server_http = { version = "0.3" }
+kodegen_candle_agent = { version = "0.3" }
+kodegen_config_manager = { version = "0.3" }
+kodegen_utils = { version = "0.3" }
 
-rmcp = { version = "0.8", features = [
+rmcp = { version = "0.9", features = [
     "client", "schemars", "server",
     "transport-child-process", "transport-io", "transport-sse-client",
     "transport-sse-client-reqwest", "transport-streamable-http-client",
@@ -91,7 +91,7 @@ sysinfo = "0.33"
 # Workspace hack for dependency deduplication
 
 [dev-dependencies]
-kodegen_mcp_client = { version = "0.2" }
+kodegen_mcp_client = { version = "0.3" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 chrono = { version = "0.4", features = ["serde"] }
 
