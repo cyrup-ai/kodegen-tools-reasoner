@@ -3,7 +3,10 @@
 //! This module spawns the local kodegen-reasoner HTTP server and connects to it.
 
 use anyhow::{Context, Result};
-use kodegen_mcp_client::{KodegenClient, KodegenConnection, create_streamable_client};
+use kodegen_mcp_client::{
+    KodegenClient, KodegenConnection, X_SESSION_GITROOT, X_SESSION_PWD, create_streamable_client,
+};
+use reqwest::header::{HeaderMap, HeaderValue};
 use rmcp::model::{CallToolResult, ServerInfo};
 use serde::de::DeserializeOwned;
 use std::path::{Path, PathBuf};
@@ -66,6 +69,46 @@ pub fn find_workspace_root() -> Result<&'static PathBuf> {
     WORKSPACE_ROOT
         .get()
         .ok_or_else(|| anyhow::anyhow!("Failed to retrieve cached workspace root"))
+}
+
+/// Find git repository root by walking up from start directory
+fn find_git_root(start: &Path) -> Option<PathBuf> {
+    let mut current = start.to_path_buf();
+    loop {
+        if current.join(".git").exists() {
+            return Some(current);
+        }
+        if !current.pop() {
+            return None;
+        }
+    }
+}
+
+/// Build session context headers for MCP client
+///
+/// Constructs HeaderMap with:
+/// - `x-session-pwd`: Current working directory
+/// - `x-session-gitroot`: Git repository root (if in a git repo)
+pub fn build_session_headers() -> Result<HeaderMap> {
+    let mut headers = HeaderMap::new();
+
+    let cwd = std::env::current_dir().context("Failed to get current directory")?;
+
+    headers.insert(
+        X_SESSION_PWD,
+        HeaderValue::from_str(&cwd.to_string_lossy())
+            .context("Failed to convert PWD to header value")?,
+    );
+
+    if let Some(git_root) = find_git_root(&cwd) {
+        headers.insert(
+            X_SESSION_GITROOT,
+            HeaderValue::from_str(&git_root.to_string_lossy())
+                .context("Failed to convert git root to header value")?,
+        );
+    }
+
+    Ok(headers)
 }
 
 /// Server process handle
@@ -167,7 +210,7 @@ pub async fn connect_with_retry(
     loop {
         attempt += 1;
 
-        match create_streamable_client(url).await {
+        match create_streamable_client(url, build_session_headers()?).await {
             Ok(result) => {
                 eprintln!(
                     "✅ Connected to HTTP server in {:?} (attempt {})",

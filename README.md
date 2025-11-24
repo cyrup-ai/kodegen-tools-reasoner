@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/img/banner.png" alt="Kodegen AI Banner" width="100%" />
+</div>
+
 # kodegen-tools-reasoner
 
 **Memory-efficient, Blazing-Fast MCP tools for code generation agents with advanced reasoning capabilities.**

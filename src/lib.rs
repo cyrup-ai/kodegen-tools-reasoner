@@ -124,7 +124,26 @@ impl Tool for ReasonerTool {
     }
 
     fn prompt_arguments() -> Vec<PromptArgument> {
-        vec![]
+        vec![
+            PromptArgument {
+                name: "strategy_focus".to_string(),
+                title: None,
+                description: Some(
+                    "Strategy to focus teaching on: 'beam_search', 'mcts', 'mcts_002_alpha', 'mcts_002alt_alpha', or 'all' for comprehensive overview"
+                        .to_string(),
+                ),
+                required: Some(false),
+            },
+            PromptArgument {
+                name: "explanation_depth".to_string(),
+                title: None,
+                description: Some(
+                    "Depth of explanation: 'basic' for quick summary, 'advanced' for detailed mechanics, 'all' for comprehensive"
+                        .to_string(),
+                ),
+                required: Some(false),
+            },
+        ]
     }
 
     async fn prompt(&self, _args: Self::PromptArgs) -> Result<Vec<PromptMessage>, McpError> {
