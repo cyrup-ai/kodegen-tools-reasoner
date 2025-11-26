@@ -4,7 +4,7 @@
 
 use anyhow::{Context, Result};
 use kodegen_mcp_client::{
-    KodegenClient, KodegenConnection, X_SESSION_GITROOT, X_SESSION_PWD, create_streamable_client,
+    KodegenClient, KodegenConnection, X_KODEGEN_CONNECTION_ID, X_KODEGEN_GITROOT, X_KODEGEN_PWD, create_streamable_client,
 };
 use reqwest::header::{HeaderMap, HeaderValue};
 use rmcp::model::{CallToolResult, ServerInfo};
@@ -87,22 +87,31 @@ fn find_git_root(start: &Path) -> Option<PathBuf> {
 /// Build session context headers for MCP client
 ///
 /// Constructs HeaderMap with:
-/// - `x-session-pwd`: Current working directory
-/// - `x-session-gitroot`: Git repository root (if in a git repo)
+/// - `x-kodegen-pwd`: Current working directory
+/// - `x-kodegen-gitroot`: Git repository root (if in a git repo)
 pub fn build_session_headers() -> Result<HeaderMap> {
+    use uuid::Uuid;
     let mut headers = HeaderMap::new();
+
+    // Connection ID - unique per example run
+    let connection_id = Uuid::new_v4().to_string();
+    headers.insert(
+        X_KODEGEN_CONNECTION_ID,
+        HeaderValue::from_str(&connection_id)
+            .context("Failed to convert connection ID to header value")?,
+    );
 
     let cwd = std::env::current_dir().context("Failed to get current directory")?;
 
     headers.insert(
-        X_SESSION_PWD,
+        X_KODEGEN_PWD,
         HeaderValue::from_str(&cwd.to_string_lossy())
             .context("Failed to convert PWD to header value")?,
     );
 
     if let Some(git_root) = find_git_root(&cwd) {
         headers.insert(
-            X_SESSION_GITROOT,
+            X_KODEGEN_GITROOT,
             HeaderValue::from_str(&git_root.to_string_lossy())
                 .context("Failed to convert git root to header value")?,
         );
