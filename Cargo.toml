@@ -1,6 +1,6 @@
 [package]
 name = "kodegen_tools_reasoner"
-version = "0.5.3"
+version = "0.5.4"
 edition = "2024"
 description = "KODEGEN.ᴀɪ: Memory-efficient, Blazing-Fast, MCP tools for code generation agents."
 authors = ["KODEGEN.ᴀɪ"]
@@ -40,7 +40,7 @@ kodegen_candle_agent = { version = "0.5" }
 kodegen_config_manager = { version = "0.5" }
 kodegen_utils = { version = "0.5" }
 
-rmcp = { version = "0.9", features = [
+rmcp = { version = "0.10", features = [
     "client", "schemars", "server",
     "transport-child-process", "transport-io", "transport-sse-client",
     "transport-sse-client-reqwest", "transport-streamable-http-client",
