@@ -12,9 +12,9 @@ mod types;
 pub use reasoner::Reasoner;
 pub use types::*;
 
-use kodegen_mcp_tool::{Tool, ToolExecutionContext, error::McpError};
-use kodegen_mcp_schema::reasoning::{ReasonerArgs, ReasonerPromptArgs};
-use rmcp::model::{Content, PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole};
+use kodegen_mcp_tool::{Tool, ToolExecutionContext, ToolResponse, error::McpError};
+use kodegen_mcp_schema::reasoning::{ReasonerArgs, ReasonerPromptArgs, ReasonerOutput};
+use rmcp::model::{PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole};
 use std::sync::Arc;
 
 // ============================================================================
@@ -62,15 +62,16 @@ impl Tool for ReasonerTool {
         true // Only tracks reasoning state, no external modifications
     }
 
-    async fn execute(&self, args: Self::Args, _ctx: ToolExecutionContext) -> Result<Vec<Content>, McpError> {
+    async fn execute(&self, args: Self::Args, _ctx: ToolExecutionContext) -> Result<ToolResponse<<Self::Args as kodegen_mcp_tool::ToolArgs>::Output>, McpError> {
         // Convert args to internal ReasoningRequest
+        let thought_content = args.thought.clone();
         let request = ReasoningRequest {
             thought: args.thought,
             thought_number: args.thought_number,
             total_thoughts: args.total_thoughts,
             next_thought_needed: args.next_thought_needed,
-            parent_id: args.parent_id,
-            strategy_type: args.strategy_type,
+            parent_id: args.parent_id.clone(),
+            strategy_type: args.strategy_type.clone(),
             beam_width: args.beam_width,
             num_simulations: args.num_simulations,
         };
@@ -91,12 +92,7 @@ impl Tool for ReasonerTool {
         ]).await;
         response.stats = stats;
 
-        // Build Vec<Content> with two items
-        let mut contents = Vec::new();
-
-        // ========================================
-        // Content[0]: Terminal-Formatted Summary
-        // ========================================
+        // Build terminal summary
         let strategy = response.strategy_used.as_deref().unwrap_or("unknown");
         let summary = format!(
             "\x1b[35m Reasoning Node: {}\x1b[0m\n\
@@ -109,18 +105,24 @@ impl Tool for ReasonerTool {
             response.is_complete,
             response.next_thought_needed
         );
-        contents.push(Content::text(summary));
 
-        // ========================================
-        // Content[1]: Machine-Parseable JSON
-        // ========================================
-        let metadata = serde_json::to_value(&response)
-            .map_err(|e| McpError::Other(anyhow::anyhow!("Serialization failed: {}", e)))?;
-        let json_str = serde_json::to_string_pretty(&metadata)
-            .unwrap_or_else(|_| "{}".to_string());
-        contents.push(Content::text(json_str));
+        // Build typed output
+        let output = ReasonerOutput {
+            session_id: response.node_id.clone(),
+            thought_number: args.thought_number,
+            total_thoughts: args.total_thoughts,
+            thought: thought_content,
+            strategy: strategy.to_string(),
+            next_thought_needed: response.next_thought_needed,
+            best_path_score: response.best_score,
+            branches: response.possible_paths,
+            history_length: response.stats.total_nodes,
+            score: response.score,
+            depth: response.depth,
+            is_complete: response.is_complete,
+        };
 
-        Ok(contents)
+        Ok(ToolResponse::new(summary, output))
     }
 
     fn prompt_arguments() -> Vec<PromptArgument> {
