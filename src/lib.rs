@@ -12,9 +12,8 @@ mod types;
 pub use reasoner::Reasoner;
 pub use types::*;
 
-use kodegen_mcp_tool::{Tool, ToolExecutionContext, ToolResponse, error::McpError};
-use kodegen_mcp_schema::reasoning::{ReasonerArgs, ReasonerPromptArgs, ReasonerOutput};
-use rmcp::model::{PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole};
+use kodegen_mcp_schema::{Tool, ToolExecutionContext, ToolResponse, McpError};
+use kodegen_mcp_schema::reasoning::{ReasonerArgs, ReasonerOutput, ReasonerPrompts};
 use std::sync::Arc;
 
 // ============================================================================
@@ -38,7 +37,7 @@ impl ReasonerTool {
 
 impl Tool for ReasonerTool {
     type Args = ReasonerArgs;
-    type PromptArgs = ReasonerPromptArgs;
+    type Prompts = ReasonerPrompts;
 
     fn name() -> &'static str {
         kodegen_mcp_schema::reasoning::REASONER
@@ -62,7 +61,7 @@ impl Tool for ReasonerTool {
         true // Only tracks reasoning state, no external modifications
     }
 
-    async fn execute(&self, args: Self::Args, _ctx: ToolExecutionContext) -> Result<ToolResponse<<Self::Args as kodegen_mcp_tool::ToolArgs>::Output>, McpError> {
+    async fn execute(&self, args: Self::Args, _ctx: ToolExecutionContext) -> Result<ToolResponse<<Self::Args as kodegen_mcp_schema::ToolArgs>::Output>, McpError> {
         // Convert args to internal ReasoningRequest
         let thought_content = args.thought.clone();
         let request = ReasoningRequest {
@@ -125,76 +124,6 @@ impl Tool for ReasonerTool {
         Ok(ToolResponse::new(summary, output))
     }
 
-    fn prompt_arguments() -> Vec<PromptArgument> {
-        vec![
-            PromptArgument {
-                name: "strategy_focus".to_string(),
-                title: None,
-                description: Some(
-                    "Strategy to focus teaching on: 'beam_search', 'mcts', 'mcts_002_alpha', 'mcts_002alt_alpha', or 'all' for comprehensive overview"
-                        .to_string(),
-                ),
-                required: Some(false),
-            },
-            PromptArgument {
-                name: "explanation_depth".to_string(),
-                title: None,
-                description: Some(
-                    "Depth of explanation: 'basic' for quick summary, 'advanced' for detailed mechanics, 'all' for comprehensive"
-                        .to_string(),
-                ),
-                required: Some(false),
-            },
-        ]
-    }
-
-    async fn prompt(&self, _args: Self::PromptArgs) -> Result<Vec<PromptMessage>, McpError> {
-        Ok(vec![
-            PromptMessage {
-                role: PromptMessageRole::User,
-                content: PromptMessageContent::text(
-                    "How do I use the reasoner tool with different strategies?",
-                ),
-            },
-            PromptMessage {
-                role: PromptMessageRole::Assistant,
-                content: PromptMessageContent::text(
-                    "The reasoner tool supports 4 reasoning strategies:\n\n\
-                     1. **beam_search** (default): Explores top N paths simultaneously\n\
-                        - Use for breadth-first exploration\n\
-                        - Set beamWidth to control path count (default: 3)\n\n\
-                     2. **mcts**: Monte Carlo Tree Search with UCB1\n\
-                        - Use for exploration-exploitation balance\n\
-                        - Set numSimulations to control search depth (default: 50)\n\n\
-                     3. **mcts_002_alpha**: MCTS with higher exploration\n\
-                        - Use for creative problem-solving\n\
-                        - 10% exploration boost\n\n\
-                     4. **mcts_002alt_alpha**: MCTS with length bonus\n\
-                        - Use for detailed reasoning\n\
-                        - Rewards thorough explanations\n\n\
-                     Example usage:\n\
-                     ```json\n\
-                     {\n\
-                       \"thought\": \"Analyzing algorithm complexity\",\n\
-                       \"thoughtNumber\": 1,\n\
-                       \"totalThoughts\": 5,\n\
-                       \"nextThoughtNeeded\": true,\n\
-                       \"strategyType\": \"mcts\",\n\
-                       \"numSimulations\": 100\n\
-                     }\n\
-                     ```\n\n\
-                     The tool returns:\n\
-                     - nodeId: Unique identifier for this thought\n\
-                     - score: Quality score (0.0-1.0)\n\
-                     - depth: Current reasoning depth\n\
-                     - strategyUsed: Which strategy was applied\n\
-                     - bestScore: Highest score in current path\n\n\
-                     Optional: Set VOYAGE_API_KEY environment variable to enable \n\
-                     semantic coherence scoring using VoyageAI embeddings.",
-                ),
-            },
-        ])
-    }
 }
 
 // ============================================================================
