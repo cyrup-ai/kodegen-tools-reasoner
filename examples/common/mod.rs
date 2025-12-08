@@ -17,12 +17,12 @@ use tokio::sync::Mutex;
 use std::sync::Arc;
 
 /// Reasoner HTTP server configuration
-const HTTP_PORT: u16 = 30443;
+const HTTP_PORT: u16 = kodegen_config::PORT_REASONING;
 const BINARY_NAME: &str = "kodegen-reasoner";
 const PACKAGE_NAME: &str = "kodegen_tools_reasoner";
 
 /// HTTP server URL for reasoner examples
-const HTTP_URL: &str = "http://127.0.0.1:30443/mcp";
+const HTTP_URL: &str = const_format::formatcp!("http://127.0.0.1:{}/mcp", kodegen_config::PORT_REASONING);
 
 /// Cached workspace root
 static WORKSPACE_ROOT: OnceLock<PathBuf> = OnceLock::new();

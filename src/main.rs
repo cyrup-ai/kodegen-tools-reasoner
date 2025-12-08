@@ -1,29 +1,31 @@
 // Category HTTP Server: Reasoner Tools
 //
 // This binary serves advanced reasoning tools over HTTP/HTTPS transport.
-// Managed by kodegend daemon, typically running on port 30453.
+// Managed by kodegend daemon, typically running on port kodegen_config::PORT_REASONING (30450).
 
 use anyhow::Result;
-use kodegen_server_http::{run_http_server, Managers, RouterSet, register_tool};
+use kodegen_config::CATEGORY_REASONER;
+use kodegen_server_http::{ServerBuilder, Managers, RouterSet, register_tool};
 use rmcp::handler::server::router::{prompt::PromptRouter, tool::ToolRouter};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    run_http_server("reasoner", |_config, _tracker| {
-        Box::pin(async move {
-        let mut tool_router = ToolRouter::new();
-        let mut prompt_router = PromptRouter::new();
-        let managers = Managers::new();
+    ServerBuilder::new()
+        .category(CATEGORY_REASONER)
+        .register_tools(|| async {
+            let mut tool_router = ToolRouter::new();
+            let mut prompt_router = PromptRouter::new();
+            let managers = Managers::new();
 
-        // Register reasoner tool (uses default cache size)
-        (tool_router, prompt_router) = register_tool(
-            tool_router,
-            prompt_router,
-            kodegen_tools_reasoner::ReasonerTool::new(None),
-        );
+            // Register reasoner tool (uses default cache size)
+            (tool_router, prompt_router) = register_tool(
+                tool_router,
+                prompt_router,
+                kodegen_tools_reasoner::ReasonerTool::new(None),
+            );
 
-        Ok(RouterSet::new(tool_router, prompt_router, managers))
+            Ok(RouterSet::new(tool_router, prompt_router, managers))
         })
-    })
-    .await
+        .run()
+        .await
 }
