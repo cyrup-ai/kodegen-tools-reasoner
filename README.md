@@ -9,7 +9,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0%20OR%20MIT-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-nightly-orange.svg)](https://www.rust-lang.org/)
 
-## Overview 
+## Overview
 
 `kodegen-tools-reasoner` is a high-performance MCP (Model Context Protocol) server that provides sophisticated reasoning strategies for AI agents. It implements multiple search algorithms including Beam Search, Monte Carlo Tree Search (MCTS), and experimental variants designed for complex problem-solving with branching and revision support.
 
