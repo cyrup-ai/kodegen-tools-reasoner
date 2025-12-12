@@ -1,6 +1,6 @@
 [package]
 name = "kodegen_tools_reasoner"
-version = "0.10.5"
+version = "0.10.6"
 edition = "2024"
 description = "KODEGEN.ᴀɪ: Memory-efficient, Blazing-Fast, MCP tools for code generation agents."
 authors = ["KODEGEN.ᴀɪ"]
@@ -93,6 +93,7 @@ kodegen_mcp_client = { version = "0.10" }
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 chrono = { version = "0.4", features = ["serde"] }
+const_format = "0.2"
 
 [[example]]
 name = "reasoner_demo"
